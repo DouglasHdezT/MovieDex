@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Laboratorio4</string>
+    <string name="movie_title_string">movie_title</string>
+    <string name="lorem_30_string">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam maximus fermentum lorem, nec bibendum ligula iaculis et. Cras semper eros a congue luctus. Integer porttitor ut mauris a aliquet. Pellentesque.</string>
+    <string name="runtime_ex_string">130min</string>
+    <string name="rate_ex_string">8.2</string>
+    <string name="movie_name_string">Movie Name</string>
+</resources>
