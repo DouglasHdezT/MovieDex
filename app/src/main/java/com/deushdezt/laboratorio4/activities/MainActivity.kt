@@ -1,5 +1,6 @@
 package com.deushdezt.laboratorio4.activities
 
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -31,9 +32,9 @@ class MainActivity : AppCompatActivity() {
         initSearchButton()
     }
 
-    fun initRecyclerView(){
+    fun initRecyclerView() {
         viewManager = LinearLayoutManager(this)
-        movieAdapter = MovieAdapter(movieList)
+        movieAdapter = MovieAdapter(movieList, { movieItem: Movie -> movieItemClicked(movieItem) })
 
         movie_list_rv.apply {
             setHasFixedSize(true)
@@ -42,51 +43,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun initSearchButton(){
-        add_movie_btn.setOnClickListener {
-            if(!movie_name_et.text.toString().isEmpty()){
-                FetchMovie().execute(movie_name_et.text.toString())
-            }
+    fun initSearchButton() = add_movie_btn.setOnClickListener {
+        if (!movie_name_et.text.toString().isEmpty()) {
+            FetchMovie().execute(movie_name_et.text.toString())
         }
     }
 
-    fun addMovieToList(movie: Movie){
+    fun addMovieToList(movie: Movie) {
         movieList.add(movie)
         movieAdapter.changeList(movieList)
         Log.d("Number", movieList.size.toString())
     }
 
-    private inner class FetchMovie : AsyncTask<String, Void, String>(){
+    private fun movieItemClicked(item: Movie) {
+        val movieBundle = Bundle()
+        movieBundle.putParcelable("MOVIE", item)
+        startActivity(Intent(this, MovieViewerActivity::class.java).putExtras(movieBundle))
+    }
 
-        override fun doInBackground(vararg params: String?): String {
+    private inner class FetchMovie : AsyncTask<String, Void, String>() {
 
-            if(params.isNullOrEmpty()) return ""
+        override fun doInBackground(vararg params: String): String {
+
+            if (params.isNullOrEmpty()) return ""
 
             val movieName = params[0]
-
-            val movieUrl = NetworkUtils().buildtSearchUrl(movieName!!)
+            val movieUrl = NetworkUtils().buildtSearchUrl(movieName)
 
             return try {
                 NetworkUtils().getResponseFromHttpUrl(movieUrl)
-            }catch (e : IOException) {
+            } catch (e: IOException) {
                 ""
             }
         }
 
-        override fun onPostExecute(movieInfo: String?) {
+        override fun onPostExecute(movieInfo: String) {
             super.onPostExecute(movieInfo)
-
-            if(!movieInfo.isNullOrEmpty()){
+            if (!movieInfo.isEmpty()) {
                 val movieJson = JSONObject(movieInfo)
-                if(movieJson.getString("Response") == "True"){
-                    var movie = Gson().fromJson<Movie>(movieInfo, Movie::class.java)
+                if (movieJson.getString("Response") == "True") {
+                    val movie = Gson().fromJson<Movie>(movieInfo, Movie::class.java)
                     addMovieToList(movie)
-
-                }else{
-                    Snackbar.make(main_ll,"No existe la película en la base", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    Snackbar.make(main_ll, "No existe la película en la base", Snackbar.LENGTH_SHORT).show()
                 }
-            }else{
-
             }
         }
     }

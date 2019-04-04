@@ -5,4 +5,5 @@
     <string name="runtime_ex_string">130min</string>
     <string name="rate_ex_string">8.2</string>
     <string name="movie_name_string">Movie Name</string>
+    <string name="n_a_value">N/A</string>
 </resources>
