@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun addMovieToList(movie: Movie){
-        movieList.add(movie);
+        movieList.add(movie)
         movieAdapter.changeList(movieList)
         Log.d("Number", movieList.size.toString())
     }
