@@ -1,6 +1,5 @@
 package com.deushdezt.laboratorio4.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -30,6 +29,10 @@ class MovieViewerActivity: AppCompatActivity() {
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(app_bar_image_viewer)
         collapsingtoolbarviewer.title = movie.Title
+        app_bar_rating_viewer.text = movie.imdbRating
+        plot_viewer.text = movie.Plot
+        director_viewer.text = movie.Director
+        actors_viewer.text = movie.Actors
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
