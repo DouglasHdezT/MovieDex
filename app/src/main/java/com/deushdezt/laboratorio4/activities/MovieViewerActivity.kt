@@ -14,12 +14,12 @@ class MovieViewerActivity: AppCompatActivity() {
         setContentView(R.layout.viewer_movie)
 
         setSupportActionBar(toolbarviewer)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        //supportActionBar?.setDisplayShowHomeEnabled(true)
         collapsingtoolbarviewer.setExpandedTitleTextAppearance(R.style.ExpandedAppBar)
         collapsingtoolbarviewer.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar)
 
-        val reciever: Movie = intent?.extras?.getParcelable("MOVIE")!!
+        val reciever: Movie = intent?.extras?.getParcelable("MOVIE") ?: Movie()
         init(reciever)
     }
 
@@ -33,6 +33,8 @@ class MovieViewerActivity: AppCompatActivity() {
         plot_viewer.text = movie.Plot
         director_viewer.text = movie.Director
         actors_viewer.text = movie.Actors
+        genre_viewer.text = movie.Genre
+        released_viewer.text = movie.Released
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

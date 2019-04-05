@@ -25,11 +25,12 @@
             android:layout_alignEnd="@id/movie_image_cv"
             android:layout_alignRight="@id/movie_image_cv"
             android:layout_alignBottom="@id/movie_image_cv"
-
             android:layout_margin="16dp"
-            android:background="#65000000"
 
+            android:background="#65000000"
             android:gravity="end"
+
+            android:lines="1"
             android:padding="8dp"
 
             android:text="@string/movie_title_string"
@@ -68,8 +69,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:lines="3"
                 android:ellipsize="end"
+                android:lines="3"
                 android:text="@string/lorem_30_string" />
 
             <TextView
