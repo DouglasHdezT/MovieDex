@@ -1,26 +1,16 @@
 package com.deushdezt.laboratorio4.fragments
 
-import android.content.Context
-import android.content.res.Configuration
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.deushdezt.laboratorio4.MyMovieAdapter
-import com.deushdezt.laboratorio4.R
 import com.deushdezt.laboratorio4.adapters.MovieAdapter
 import com.deushdezt.laboratorio4.adapters.MovieSimpleListAdapter
-import com.deushdezt.laboratorio4.pojos.Movie
 import kotlinx.android.synthetic.main.movies_list_fragment.*
 
-class MainListFragment: Fragment(), MainListFragment.searchNewMovieListener {
+class MainListFragment: Fragment(), SearchNewMovieListener {
 
     lateinit var  movies :List<Movie>
     lateinit var moviesAdapter : MyMovieAdapter
-    lateinit var listenerTool ?: searchNewMovieListener
+    lateinit var listenerTool ?:  SearchNewMovieListener
 
     companion object {
         fun newInstance(dataset : List<Movie>): MainListFragment{
@@ -30,9 +20,12 @@ class MainListFragment: Fragment(), MainListFragment.searchNewMovieListener {
         }
     }
 
-    interface searchNewMovieListener{
+    interface SearchNewMovieListener{
         fun searchMovie(movieName: String)
-        fun updateListToAdapter(adapter : MyMovieAdapter)
+
+        fun managePortraitItemClick(movie: Movie)
+
+        fun manageLandscapeClick(movie: Movie)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -47,10 +40,10 @@ class MainListFragment: Fragment(), MainListFragment.searchNewMovieListener {
     fun initRecyclerView(orientation:Int){
         val linearLayoutManager = LinearLayoutManager(this.context)
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
-            moviesAdapter = MovieAdapter(movies, {})
+            moviesAdapter = MovieAdapter(movies, {movie:Movie->listenerTool.managePortraitClick(movie)})
             movie_list_rv.adapter = moviesAdapter as MovieAdapter
         }else{
-            moviesAdapter = MovieSimpleListAdapter(movies, {})
+            moviesAdapter = MovieSimpleListAdapter(movies, {movie:Movie->listenerTool.manageLandscapeClick(movie)})
             movie_list_rv.adapter = moviesAdapter as MovieSimpleListAdapter
         }
 
@@ -60,17 +53,21 @@ class MainListFragment: Fragment(), MainListFragment.searchNewMovieListener {
         }
     }
 
+    fun initSearchButton() = add_movie_btn.setOnClickListener {
+        listenerTool.searchMovie(movie_name_et.text.toString())
+    }
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is searchNewMovieListener) {
-            listener = context
+        if (context is SearchNewMovieListener) {
+            listenerTool = context
         } else {
-            throw RuntimeException("Se necesita una implementación de  OnSelectOption")
+            throw RuntimeException("Se necesita una implementación de  la interfaz")
         }
     }
 
     override fun onDetach() {
         super.onDetach()
-
+        listenerTool = null
     }
 }
