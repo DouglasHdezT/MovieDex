@@ -5,24 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
+import com.deushdezt.laboratorio4.MyMovieAdapter
 import com.deushdezt.laboratorio4.R
 import com.deushdezt.laboratorio4.pojos.Movie
 import kotlinx.android.synthetic.main.cardview_movie.view.*
 
-class MovieAdapter(var movies: List<Movie>, val clickListener: (Movie) -> Unit): RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
-
-
+class MovieAdapter(var movies: List<Movie>, val clickListener: (Movie) -> Unit): RecyclerView.Adapter<MovieAdapter.ViewHolder>(), MyMovieAdapter {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.cardview_movie, parent, false)
         return ViewHolder(view)
     }
-
     override fun getItemCount() = movies.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(movies[position], clickListener)
 
-    fun changeList(movies: List<Movie>){
-        this.movies = movies
+    override fun changeDataSet(newDataSet: List<Movie>) {
+        this.movies = newDataSet
         notifyDataSetChanged()
     }
 

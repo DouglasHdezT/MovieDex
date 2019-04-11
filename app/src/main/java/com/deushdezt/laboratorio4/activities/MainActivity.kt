@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import com.deushdezt.laboratorio4.MyMovieAdapter
 import com.deushdezt.laboratorio4.R
 import com.deushdezt.laboratorio4.adapters.MovieAdapter
 import com.deushdezt.laboratorio4.network.NetworkUtils
@@ -19,7 +20,7 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var movieAdapter: MovieAdapter
+    private lateinit var movieAdapter: MyMovieAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     private var movieList: ArrayList<Movie> = ArrayList()
@@ -34,12 +35,12 @@ class MainActivity : AppCompatActivity() {
 
     fun initRecyclerView() {
         viewManager = LinearLayoutManager(this)
-        movieAdapter = MovieAdapter(movieList, { movieItem: Movie -> movieItemClicked(movieItem) })
+        movieAdapter = MovieAdapter(movieList) { movieItem: Movie -> movieItemClickedPotrait(movieItem) }
 
         movie_list_rv.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
-            adapter = movieAdapter
+            adapter = movieAdapter as MovieAdapter
         }
     }
 
@@ -51,14 +52,18 @@ class MainActivity : AppCompatActivity() {
 
     fun addMovieToList(movie: Movie) {
         movieList.add(movie)
-        movieAdapter.changeList(movieList)
+        movieAdapter.changeDataSet(movieList)
         Log.d("Number", movieList.size.toString())
     }
 
-    private fun movieItemClicked(item: Movie) {
+    private fun movieItemClickedPotrait(item: Movie) {
         val movieBundle = Bundle()
         movieBundle.putParcelable("MOVIE", item)
         startActivity(Intent(this, MovieViewerActivity::class.java).putExtras(movieBundle))
+    }
+
+    private fun movieItemClickedLand(item: Movie) {
+
     }
 
     private inner class FetchMovie : AsyncTask<String, Void, String>() {
