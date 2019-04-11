@@ -1,16 +1,24 @@
 package com.deushdezt.laboratorio4.fragments
 
+import android.content.Context
+import android.content.res.Configuration
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.deushdezt.laboratorio4.MyMovieAdapter
 import com.deushdezt.laboratorio4.adapters.MovieAdapter
 import com.deushdezt.laboratorio4.adapters.MovieSimpleListAdapter
+import com.deushdezt.laboratorio4.pojos.Movie
 import kotlinx.android.synthetic.main.movies_list_fragment.*
 
-class MainListFragment: Fragment(), SearchNewMovieListener {
+class MainListFragment: Fragment(){
 
     lateinit var  movies :List<Movie>
     lateinit var moviesAdapter : MyMovieAdapter
-    lateinit var listenerTool ?:  SearchNewMovieListener
+    var listenerTool :  SearchNewMovieListener? = null
 
     companion object {
         fun newInstance(dataset : List<Movie>): MainListFragment{
@@ -25,7 +33,7 @@ class MainListFragment: Fragment(), SearchNewMovieListener {
 
         fun managePortraitItemClick(movie: Movie)
 
-        fun manageLandscapeClick(movie: Movie)
+        fun manageLandscapeItemClick(movie: Movie)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,6 +41,7 @@ class MainListFragment: Fragment(), SearchNewMovieListener {
 
         initRecyclerView(resources.configuration.orientation)
 
+        initSearchButton()
 
         return container
     }
@@ -40,10 +49,10 @@ class MainListFragment: Fragment(), SearchNewMovieListener {
     fun initRecyclerView(orientation:Int){
         val linearLayoutManager = LinearLayoutManager(this.context)
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
-            moviesAdapter = MovieAdapter(movies, {movie:Movie->listenerTool.managePortraitClick(movie)})
+            moviesAdapter = MovieAdapter(movies, {movie:Movie->listenerTool?.managePortraitItemClick(movie)})
             movie_list_rv.adapter = moviesAdapter as MovieAdapter
         }else{
-            moviesAdapter = MovieSimpleListAdapter(movies, {movie:Movie->listenerTool.manageLandscapeClick(movie)})
+            moviesAdapter = MovieSimpleListAdapter(movies, {movie:Movie->listenerTool?.manageLandscapeItemClick(movie)})
             movie_list_rv.adapter = moviesAdapter as MovieSimpleListAdapter
         }
 
@@ -54,7 +63,7 @@ class MainListFragment: Fragment(), SearchNewMovieListener {
     }
 
     fun initSearchButton() = add_movie_btn.setOnClickListener {
-        listenerTool.searchMovie(movie_name_et.text.toString())
+        listenerTool?.searchMovie(movie_name_et.text.toString())
     }
 
     override fun onAttach(context: Context?) {

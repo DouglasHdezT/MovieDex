@@ -3,25 +3,22 @@ package com.deushdezt.laboratorio4.activities
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.design.widget.Snackbar
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
-import com.deushdezt.laboratorio4.MyMovieAdapter
+import android.widget.Toast
 import com.deushdezt.laboratorio4.R
-import com.deushdezt.laboratorio4.adapters.MovieAdapter
+import com.deushdezt.laboratorio4.fragments.MainListFragment
 import com.deushdezt.laboratorio4.network.NetworkUtils
 import com.deushdezt.laboratorio4.pojos.Movie
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 import java.io.IOException
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListener {
+    private val MAIN_LIST_KEY = "key_list_movies"
 
-    private lateinit var movieAdapter: MyMovieAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var mainFragment : MainListFragment
 
     private var movieList: ArrayList<Movie> = ArrayList()
 
@@ -29,41 +26,45 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initRecyclerView()
-        initSearchButton()
+        if(savedInstanceState != null) movieList = savedInstanceState.getParcelableArrayList<Movie>(MAIN_LIST_KEY) as ArrayList<Movie>
+
+        initMainFragment()
+
     }
 
-    fun initRecyclerView() {
-        viewManager = LinearLayoutManager(this)
-        movieAdapter = MovieAdapter(movieList) { movieItem: Movie -> movieItemClickedPotrait(movieItem) }
+    fun initMainFragment(){
+        mainFragment = MainListFragment.newInstance(movieList)
 
-        movie_list_rv.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = movieAdapter as MovieAdapter
-        }
-    }
-
-    fun initSearchButton() = add_movie_btn.setOnClickListener {
-        if (!movie_name_et.text.toString().isEmpty()) {
-            FetchMovie().execute(movie_name_et.text.toString())
-        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_fragment, mainFragment)
+            .commit()
     }
 
     fun addMovieToList(movie: Movie) {
         movieList.add(movie)
-        movieAdapter.changeDataSet(movieList)
+        mainFragment.moviesAdapter.changeDataSet(movieList)
         Log.d("Number", movieList.size.toString())
     }
 
-    private fun movieItemClickedPotrait(item: Movie) {
+    override fun searchMovie(movieName: String) {
+        FetchMovie().execute(movieName)
+    }
+
+    override fun managePortraitItemClick(movie: Movie) {
         val movieBundle = Bundle()
-        movieBundle.putParcelable("MOVIE", item)
+        movieBundle.putParcelable("MOVIE", movie)
         startActivity(Intent(this, MovieViewerActivity::class.java).putExtras(movieBundle))
     }
 
-    private fun movieItemClickedLand(item: Movie) {
+    override fun manageLandscapeItemClick(movie: Movie) {
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        if (outState != null) {
+            outState.putParcelableArrayList(MAIN_LIST_KEY, movieList)
+        }
     }
 
     private inner class FetchMovie : AsyncTask<String, Void, String>() {
@@ -90,8 +91,11 @@ class MainActivity : AppCompatActivity() {
                     val movie = Gson().fromJson<Movie>(movieInfo, Movie::class.java)
                     addMovieToList(movie)
                 } else {
-                    Snackbar.make(main_ll, "No existe la película en la base", Snackbar.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "No existe en la base de datos,", Toast.LENGTH_LONG).show()
                 }
+            }else
+            {
+                Toast.makeText(this@MainActivity, "A ocurrido un error,", Toast.LENGTH_LONG).show()
             }
         }
     }
