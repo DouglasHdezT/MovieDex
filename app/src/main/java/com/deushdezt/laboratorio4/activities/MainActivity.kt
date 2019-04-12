@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import com.deushdezt.laboratorio4.AppConstants
 import com.deushdezt.laboratorio4.R
 import com.deushdezt.laboratorio4.fragments.MainContentFragment
 import com.deushdezt.laboratorio4.fragments.MainListFragment
@@ -25,12 +26,19 @@ class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        movieList = savedInstanceState?.getParcelableArrayList(AppConstants.dataset_saveinstance_key) ?: ArrayList()
 
         initMainFragment()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelableArrayList(AppConstants.dataset_saveinstance_key, movieList)
+        super.onSaveInstanceState(outState)
+    }
+
     fun initMainFragment(){
         mainFragment = MainListFragment.newInstance(movieList)
+
         val resource = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
             R.id.main_fragment
         else {

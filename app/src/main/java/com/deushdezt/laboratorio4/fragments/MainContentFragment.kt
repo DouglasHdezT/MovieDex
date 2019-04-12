@@ -22,13 +22,9 @@ class MainContentFragment: Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-         val view = inflater.inflate(R.layout.main_content_fragment_layout, container, false)
+        val view = inflater.inflate(R.layout.main_content_fragment_layout, container, false)
 
         bindData(view)
 
@@ -45,7 +41,6 @@ class MainContentFragment: Fragment() {
         Glide.with(view).load(movie.Poster)
             .placeholder(R.drawable.ic_launcher_background)
             .into(view.image_main_content_fragment)
-
     }
 
 }
