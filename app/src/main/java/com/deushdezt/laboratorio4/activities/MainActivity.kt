@@ -1,13 +1,14 @@
 package com.deushdezt.laboratorio4.activities
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import com.deushdezt.laboratorio4.R
+import com.deushdezt.laboratorio4.fragments.MainContentFragment
 import com.deushdezt.laboratorio4.fragments.MainListFragment
 import com.deushdezt.laboratorio4.network.NetworkUtils
 import com.deushdezt.laboratorio4.pojos.Movie
@@ -16,27 +17,33 @@ import org.json.JSONObject
 import java.io.IOException
 
 class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListener {
-    private val MAIN_LIST_KEY = "key_list_movies"
-
     private lateinit var mainFragment : MainListFragment
+    private lateinit var mainContentFragment: MainContentFragment
 
-    private var movieList: ArrayList<Movie> = ArrayList()
+    private var movieList = ArrayList<Movie>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if(savedInstanceState != null) movieList = savedInstanceState.getParcelableArrayList<Movie>(MAIN_LIST_KEY) as ArrayList<Movie>
-
         initMainFragment()
-
     }
 
     fun initMainFragment(){
         mainFragment = MainListFragment.newInstance(movieList)
+        val resource = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+            R.id.main_fragment
+        else {
+            mainContentFragment = MainContentFragment.newInstance(Movie())
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.land_main_cont_fragment, mainContentFragment)
+                .commit()
+
+            R.id.land_main_fragment
+        }
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.main_fragment, mainFragment)
+            .replace(resource, mainFragment)
             .commit()
     }
 
@@ -57,14 +64,11 @@ class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListene
     }
 
     override fun manageLandscapeItemClick(movie: Movie) {
+        mainContentFragment = MainContentFragment.newInstance(movie)
 
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        if (outState != null) {
-            outState.putParcelableArrayList(MAIN_LIST_KEY, movieList)
-        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.land_main_cont_fragment, mainContentFragment)
+            .commit()
     }
 
     private inner class FetchMovie : AsyncTask<String, Void, String>() {

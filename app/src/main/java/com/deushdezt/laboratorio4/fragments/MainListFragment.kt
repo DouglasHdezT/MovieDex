@@ -9,19 +9,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.deushdezt.laboratorio4.MyMovieAdapter
+import com.deushdezt.laboratorio4.R
 import com.deushdezt.laboratorio4.adapters.MovieAdapter
 import com.deushdezt.laboratorio4.adapters.MovieSimpleListAdapter
 import com.deushdezt.laboratorio4.pojos.Movie
 import kotlinx.android.synthetic.main.movies_list_fragment.*
+import kotlinx.android.synthetic.main.movies_list_fragment.view.*
 
 class MainListFragment: Fragment(){
 
-    lateinit var  movies :List<Movie>
+    private val MAIN_LIST_KEY = "key_list_movies"
+
+    lateinit var  movies :ArrayList<Movie>
     lateinit var moviesAdapter : MyMovieAdapter
     var listenerTool :  SearchNewMovieListener? = null
 
     companion object {
-        fun newInstance(dataset : List<Movie>): MainListFragment{
+        fun newInstance(dataset : ArrayList<Movie>): MainListFragment{
             val newFragment = MainListFragment()
             newFragment.movies = dataset
             return newFragment
@@ -38,31 +42,34 @@ class MainListFragment: Fragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
+        var view = inflater.inflate(R.layout.movies_list_fragment, container, false)
 
-        initRecyclerView(resources.configuration.orientation)
+        if(savedInstanceState != null) movies = savedInstanceState.getParcelableArrayList<Movie>(MAIN_LIST_KEY)!!
 
-        initSearchButton()
+        initRecyclerView(resources.configuration.orientation, view)
+        initSearchButton(view)
 
-        return container
+        return view
     }
 
-    fun initRecyclerView(orientation:Int){
+    fun initRecyclerView(orientation:Int, container:View){
         val linearLayoutManager = LinearLayoutManager(this.context)
+
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
             moviesAdapter = MovieAdapter(movies, {movie:Movie->listenerTool?.managePortraitItemClick(movie)})
-            movie_list_rv.adapter = moviesAdapter as MovieAdapter
+            container.movie_list_rv.adapter = moviesAdapter as MovieAdapter
         }else{
             moviesAdapter = MovieSimpleListAdapter(movies, {movie:Movie->listenerTool?.manageLandscapeItemClick(movie)})
-            movie_list_rv.adapter = moviesAdapter as MovieSimpleListAdapter
+            container.movie_list_rv.adapter = moviesAdapter as MovieSimpleListAdapter
         }
 
-        movie_list_rv.apply {
+        container.movie_list_rv.apply {
             setHasFixedSize(true)
             layoutManager = linearLayoutManager
         }
     }
 
-    fun initSearchButton() = add_movie_btn.setOnClickListener {
+    fun initSearchButton(container:View) = container.add_movie_btn.setOnClickListener {
         listenerTool?.searchMovie(movie_name_et.text.toString())
     }
 
@@ -73,6 +80,11 @@ class MainListFragment: Fragment(){
         } else {
             throw RuntimeException("Se necesita una implementación de  la interfaz")
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList(MAIN_LIST_KEY, movies)
     }
 
     override fun onDetach() {

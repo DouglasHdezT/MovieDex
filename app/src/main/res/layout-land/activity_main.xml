@@ -11,9 +11,10 @@
     tools:context=".activities.MainActivity">
 
     <FrameLayout
-        android:id="@+id/main_fragment"
+        android:id="@+id/land_main_fragment"
         android:layout_marginBottom="8dp"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"/>
 
     <LinearLayout
@@ -23,7 +24,6 @@
 
         <FrameLayout
             android:id="@+id/land_main_cont_fragment"
-            android:layout_marginBottom="8dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
