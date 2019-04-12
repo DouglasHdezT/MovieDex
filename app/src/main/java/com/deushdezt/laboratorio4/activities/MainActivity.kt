@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
@@ -17,7 +18,7 @@ import com.google.gson.Gson
 import org.json.JSONObject
 import java.io.IOException
 
-class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var mainFragment : MainListFragment
     private lateinit var mainContentFragment: MainContentFragment
 
@@ -33,45 +34,48 @@ class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListene
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelableArrayList(AppConstants.dataset_saveinstance_key, movieList)
+        supportFragmentManager.popBackStack()
         super.onSaveInstanceState(outState)
     }
 
     fun initMainFragment(){
-        mainFragment = MainListFragment.newInstance(movieList)
+        mainFragment = MainListFragment.newInstance(movieList,
+            {query: String -> searchMovie(query)},
+            {moviedata: Movie -> managePortraitItemClick(moviedata)},
+            {moviedata: Movie -> manageLandscapeItemClick(moviedata)})
 
-        val resource = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+            val resource = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+
             R.id.main_fragment
         else {
             mainContentFragment = MainContentFragment.newInstance(Movie())
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.land_main_cont_fragment, mainContentFragment)
-                .commit()
+            changeFragment(R.id.land_main_cont_fragment, mainContentFragment)
 
             R.id.land_main_fragment
         }
 
-        supportFragmentManager.beginTransaction()
-            .replace(resource, mainFragment)
-            .commit()
+        changeFragment(resource, mainFragment)
     }
 
-    fun addMovieToList(movie: Movie) {
+    private fun changeFragment(id: Int, frag: Fragment){ supportFragmentManager.beginTransaction().replace(id, frag).commit() }
+
+    private fun addMovieToList(movie: Movie) {
         movieList.add(movie)
-        mainFragment.moviesAdapter.changeDataSet(movieList)
+        mainFragment.updateAdapter(movieList)
         Log.d("Number", movieList.size.toString())
     }
 
-    override fun searchMovie(movieName: String) {
+    private fun searchMovie(movieName: String) {
         FetchMovie().execute(movieName)
     }
 
-    override fun managePortraitItemClick(movie: Movie) {
+    private fun managePortraitItemClick(movie: Movie) {
         val movieBundle = Bundle()
         movieBundle.putParcelable("MOVIE", movie)
         startActivity(Intent(this, MovieViewerActivity::class.java).putExtras(movieBundle))
     }
 
-    override fun manageLandscapeItemClick(movie: Movie) {
+    private fun manageLandscapeItemClick(movie: Movie) {
         mainContentFragment = MainContentFragment.newInstance(movie)
 
         supportFragmentManager.beginTransaction()
