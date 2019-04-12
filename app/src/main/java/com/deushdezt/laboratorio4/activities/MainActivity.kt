@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
@@ -43,21 +44,17 @@ class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListene
             R.id.main_fragment
         else {
             mainContentFragment = MainContentFragment.newInstance(Movie())
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.land_main_cont_fragment, mainContentFragment)
-                .commit()
+            changeFragment(R.id.land_main_cont_fragment, mainContentFragment)
 
             R.id.land_main_fragment
         }
 
-        supportFragmentManager.beginTransaction()
-            .replace(resource, mainFragment)
-            .commit()
+        changeFragment(resource, mainFragment)
     }
 
     fun addMovieToList(movie: Movie) {
         movieList.add(movie)
-        mainFragment.moviesAdapter.changeDataSet(movieList)
+        mainFragment.updateMoviesAdapter(movieList)
         Log.d("Number", movieList.size.toString())
     }
 
@@ -71,12 +68,11 @@ class MainActivity : AppCompatActivity(), MainListFragment.SearchNewMovieListene
         startActivity(Intent(this, MovieViewerActivity::class.java).putExtras(movieBundle))
     }
 
+    private fun changeFragment(id: Int, frag: Fragment){ supportFragmentManager.beginTransaction().replace(id, frag).commit() }
+
     override fun manageLandscapeItemClick(movie: Movie) {
         mainContentFragment = MainContentFragment.newInstance(movie)
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.land_main_cont_fragment, mainContentFragment)
-            .commit()
+        changeFragment(R.id.land_main_cont_fragment, mainContentFragment)
     }
 
     private inner class FetchMovie : AsyncTask<String, Void, String>() {

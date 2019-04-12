@@ -21,7 +21,7 @@ class MainListFragment: Fragment(){
     private val MAIN_LIST_KEY = "key_list_movies"
 
     lateinit var  movies :ArrayList<Movie>
-    lateinit var moviesAdapter : MyMovieAdapter
+    private lateinit var moviesAdapter : MyMovieAdapter
     var listenerTool :  SearchNewMovieListener? = null
 
     companion object {
@@ -72,6 +72,8 @@ class MainListFragment: Fragment(){
     fun initSearchButton(container:View) = container.add_movie_btn.setOnClickListener {
         listenerTool?.searchMovie(movie_name_et.text.toString())
     }
+
+    fun updateMoviesAdapter(movieList: ArrayList<Movie>){ moviesAdapter.changeDataSet(movieList) }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
